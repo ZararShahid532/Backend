@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
       },
       watchHistory:[{
         type: mongoose.Schema.Types.ObjectId, // Cloudinary Service ka url use kara ga 
-        ref: "videoz"
+        ref: "video"
       }
     ],
     password:{
