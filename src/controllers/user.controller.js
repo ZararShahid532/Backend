@@ -420,20 +420,23 @@ const User = await user.aggregate([
             foreignField: "_id",
             as: "watchHistory",
             pipeline: [    // Extent piprline using nested pipeline
-            
+            {
                 $lookup: {
                     from: "user",
                     localField: "owner",
                     foreignField: "_id",
                     as: "owner",
                     pipeline: [
+                        {
                         $project: {
                             fullname: 1,
                             username: 1,
                             avatar: 1
                         }
-                    ]
-                },
+                }
+            ]
+                }
+            },
                 {
                     $addFields: {
                         owner: {
