@@ -4,6 +4,7 @@ import { user} from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose";
 
 
 const generateAccessAndRefreshToken = async (userId) =>
@@ -395,7 +396,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
   ])
 
   if (!channel?.length) {
-    throw new ApiError(404"Channel does not exist");
+    throw new ApiError(404 ,"Channel does not exist");
     
   }
   return res.status(200).json(
@@ -403,6 +404,50 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
   )
    })
 
+const getWatchHistory = asyncHandler(async(req, res)=>{
+
+const User = await user.aggregate([
+    {
+        $match: {
+            _id: new mongoose.Types.ObjectId(req.User._id)   // Aggeration pipeline doesnot support mongoose that why we can get id for this method.
+            
+        }
+    },
+    {
+        $lookup: {
+            from: "video",
+            localField: "watchHistory",
+            foreignField: "_id",
+            as: "watchHistory",
+            pipeline: [    // Extent piprline using nested pipeline
+            
+                $lookup: {
+                    from: "user",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "owner",
+                    pipeline: [
+                        $project: {
+                            fullname: 1,
+                            username: 1,
+                            avatar: 1
+                        }
+                    ]
+                },
+                {
+                    $addFields: {
+                        owner: {
+                            $first: "$owner"  // first is uesd to find first element in array
+                        }
+                    }
+                }
+            ]
+        }
+    }
+])
+
+return res.status(200).json(new ApiResponse(200, User[0].watchHistory, "Watch History Fetched Successfully"))
+})
 
 
 export {
@@ -414,5 +459,8 @@ export {
     getCurrentUser,
     updateAccountDetail,
     updateUserAvatar,
-    updateUsercoverImage
+    updateUsercoverImage,
+    getUserChannelProfile,
+    getWatchHistory
+    
 }
