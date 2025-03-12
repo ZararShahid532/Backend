@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
 
 
+
 const generateAccessAndRefreshToken = async (userId) =>
 {   
    
@@ -106,6 +107,7 @@ const registerUser = asyncHandler( async (req, res) => {
        {
          throw new ApiError(500,"Something went wrong while registring a user");
         }
+      //  console.log(User)
 
         return res.status(201).json(
             new ApiResponse(200, createdUser, "User register successfully")
@@ -154,7 +156,7 @@ const loginUser = asyncHandler(async(req,res)=>{
     secure: true
    }
 
-   return res.status(200).cookie("accessToken",accessToken,option).cookie("refreshToken",refreshToken.option).json(
+   return res.status(200).cookie("accessToken",accessToken,option).cookie("refreshToken",refreshToken,option).json(
     new ApiResponse(
         200,
         {
@@ -170,7 +172,7 @@ const logoutUser = asyncHandler(async(req, res)=>{
     await user.findByIdAndUpdate(req.User._id,
         {
             $set: {
-                refreshToken: undefined
+                refreshToken: 1
             }
         },
         {
@@ -233,6 +235,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
     
       const User = await user.findById(req.User?._id);
       const isPasswordCorrect = await User.isPasswordCorrect(oldPassword);
+      //console.log(isPasswordCorrect);
       
       if(!isPasswordCorrect)
       {
@@ -273,7 +276,7 @@ const updateAccountDetail = asyncHandler(async(req,res)=>{
     
     ).select("-password")
 
-    return res.status(200).json(new ApiResponse(200, user, "Account detail updated successfully"))
+    return res.status(200).json(new ApiResponse(200, User, "Account detail updated successfully"))
 })
 
 const updateUserAvatar = asyncHandler(async(req,res)=>{
@@ -299,7 +302,7 @@ const updateUserAvatar = asyncHandler(async(req,res)=>{
         {new: true}
     ).select("-password")
 
-    return res.status(200).json(new ApiResponse(200, user, "Update Avatar Successfully"))
+    return res.status(200).json(new ApiResponse(200, User, "Update Avatar Successfully"))
 
 })
 
@@ -326,14 +329,14 @@ const updateUsercoverImage = asyncHandler(async(req,res)=>{
         {new: true}
     ).select("-password")
 
-    return res.status(200).json(new ApiResponse(200, user, "Update CoverImage Successfully"))
+    return res.status(200).json(new ApiResponse(200, User, "Update CoverImage Successfully"))
 
 })
 
 const getUserChannelProfile = asyncHandler(async(req, res)=>{
 
     const {username} = req.params;  // get data from url link
-
+console.log(username)
     if(!username?.trim())
     {
         throw new ApiError(400,"User name is missing")
@@ -384,7 +387,7 @@ const getUserChannelProfile = asyncHandler(async(req, res)=>{
             fullname: 1,
             username: 1,
             subscriberCount: 1,
-            channelSubscribedToCount,
+            channelSubscribedToCount: 1,
             isSubscribed: 1,
             avatar: 1,
             coverImage: 1,
