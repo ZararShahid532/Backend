@@ -232,6 +232,7 @@ try {
 const changeCurrentPassword = asyncHandler(async(req,res)=>{
  
     const{oldPassword, newPassword} = req.body;
+    console.log(oldPassword)
     
       const User = await user.findById(req.User?._id);
       const isPasswordCorrect = await User.isPasswordCorrect(oldPassword);
@@ -253,7 +254,7 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
 
 const getCurrentUser = asyncHandler(async(req,res)=>{
 
-    return res.status(200).json( new ApiResponse(200, req.user, "Current User Fetch Successfully"))
+    return res.status(200).json( new ApiResponse(200, req.User, "Current User Fetch Successfully"))
 })
 
 

@@ -55,8 +55,16 @@ userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 10)
     next()
 })
+userSchema.methods.isPasswordCorrect = async function (password) {
+ // console.log(password)
+  if (!password) {
+      throw new Error("Password is required");
+  }
 
-userSchema.methods.isPasswordCorrect = async function(password) {
+  if (!this.password) {
+      throw new Error("Stored password hash is missing");
+  }
+
   return await bcrypt.compare(password, this.password);
 };
 
